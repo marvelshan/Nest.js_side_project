@@ -35,20 +35,27 @@ export class AuthService {
     }
   }
   async signin(dto: AuthDto) {
-    // find the user by phoneNumber
-    const user = await this.prisma.user.findUnique({
-      where: {
-        phoneNumber: dto.phoneNumber,
-      },
-    });
-    // if user does noe exit throw exception
-    if (!user) throw new ForbiddenException('Credentials incorrect');
-    // compare password
-    const pwMatches = await argon.verify(user.hash, dto.password);
-    // if password incorrect throw exception
-    if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
+    try {
+      // find the user by phoneNumber
+      const user = await this.prisma.user.findUnique({
+        where: {
+          phoneNumber: dto.phoneNumber,
+        },
+      });
+      // if user does noe exit throw exception
+      if (!user)
+        throw new ForbiddenException(
+          'User does not exist or phone number is incorrect',
+        );
+      // compare password
+      const pwMatches = await argon.verify(user.hash, dto.password);
+      // if password incorrect throw exception
+      if (!pwMatches) throw new ForbiddenException('Incorrect password');
 
-    return this.signToken(user.id, user.phoneNumber);
+      return this.signToken(user.id, user.phoneNumber);
+    } catch (error) {
+      console.log(`auth service signin error is ${error}`);
+    }
   }
 
   async signToken(

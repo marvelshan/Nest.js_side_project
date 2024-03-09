@@ -20,6 +20,7 @@ model User {
   phoneNumber  String    @unique
   hash     String
   patients     Patient[] @relation("UserPatients")
+  appointments Appointment[] @relation("UserAppointments")
 }
 
 model Patient {
@@ -34,11 +35,13 @@ model Patient {
 }
 
 model Appointment {
-  id          Int      @default(autoincrement()) @id
-  patient     Patient  @relation(fields: [patientId], references: [id])
-  patientId   Int      @map("patient_id")
+  id                  Int       @default(autoincrement()) @id
   consultationContent String
-  date        DateTime
-  hour        Int
-  @@unique([patientId, date, hour])
+  date                DateTime
+  hour                String
+  user                User      @relation("UserAppointments", fields: [userId], references: [id])
+  userId              Int       @map("user_id")
+  patient             Patient   @relation(fields: [patientId], references: [id])
+  patientId           Int       @map("patient_id")
+  @@unique([userId, patientId, date, hour])
 }

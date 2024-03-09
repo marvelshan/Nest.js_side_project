@@ -34,6 +34,7 @@ export class AuthService {
       throw error;
     }
   }
+
   async signin(dto: AuthDto) {
     try {
       // find the user by phoneNumber

@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Post,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
@@ -11,20 +12,21 @@ import { JwtGuard } from 'src/auth/guard';
 
 @Controller('appointments')
 export class AppointmentController {
-  constructor(
-    private readonly appointmentService: AppointmentService,
-    private readonly jwtValidator: Jwt,
-  ) {}
+  constructor(private readonly appointmentService: AppointmentService) {}
 
   @UseGuards(JwtGuard)
   @Post()
-  async createAppointment(@Body() createAppointmentDto: AppointmentDto) {
+  async createAppointment(
+    @Body() createAppointmentDto: AppointmentDto,
+    @Request() req,
+  ) {
     try {
+      const userId = req.user.id;
+      const appointmentWithUserIdDto = { ...createAppointmentDto, userId };
       return await this.appointmentService.createAppointment(
-        createAppointmentDto,
+        appointmentWithUserIdDto,
       );
     } catch (error) {
-      console.log(error);
       throw new BadRequestException(error.message);
     }
   }

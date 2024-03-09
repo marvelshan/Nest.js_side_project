@@ -1,7 +1,25 @@
-import { IsNotEmpty, IsString, IsNumber, IsDateString } from 'class-validator';
+import { IsNotEmpty, IsString, IsDateString } from 'class-validator';
 
 export class PatientDto {
-  @IsNumber()
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  identity: string;
+
+  @IsDateString()
+  @IsNotEmpty()
+  birthday: Date;
+
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+}
+
+export class PatientWithUserIdDto {
+  @IsString()
   @IsNotEmpty()
   userId: number;
 

@@ -14,5 +14,26 @@ export class AppointmentDto {
   date: Date;
 
   @IsNotEmpty()
-  hour: number;
+  hour: string;
+}
+
+export class AppointmentWithUserIdDto {
+  @IsNumber()
+  @IsNotEmpty()
+  patientId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  userId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  consultationContent: string;
+
+  @IsDateString()
+  @IsNotEmpty()
+  date: Date;
+
+  @IsNotEmpty()
+  hour: string;
 }

@@ -1,13 +1,13 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PatientDto } from './dto';
+import { PatientWithUserIdDto } from './dto';
 
 @Injectable()
 export class PatientService {
   constructor(private prisma: PrismaService) {}
 
-  async createPatient(patientDto: PatientDto) {
-    const { userId, name, identity, birthday, address } = patientDto;
+  async createPatient(patientWithUserIdDto: PatientWithUserIdDto) {
+    const { userId, name, identity, birthday, address } = patientWithUserIdDto;
     // Check if identity already exists
     const existingPatient = await this.prisma.patient.findUnique({
       where: { identity },

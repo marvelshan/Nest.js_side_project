@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
 import * as argon from 'argon2';
@@ -17,12 +22,37 @@ export class AuthService {
   async signup(dto: AuthDto) {
     const hash = await argon.hash(dto.password);
     try {
+      // Check if phoneNumber is valid
+      const phoneNumberRegex = /^09\d{8}$/;
+      if (!phoneNumberRegex.test(dto.phoneNumber)) {
+        throw new BadRequestException('Invalid phone number format');
+      }
+
+      // Check if phoneNumber is already registered
+      const existingUser = await this.prisma.user.findFirst({
+        where: {
+          phoneNumber: dto.phoneNumber,
+        },
+      });
+      if (existingUser) {
+        throw new ConflictException('Phone number already registered');
+      }
+
+      // Check if password is valid
+      if (dto.password.length < 10 || dto.password.length > 30) {
+        throw new BadRequestException(
+          'Password must be between 10 and 30 characters',
+        );
+      }
+
+      // Create new user
       const user = await this.prisma.user.create({
         data: {
           phoneNumber: dto.phoneNumber,
           hash,
         },
       });
+
       return this.signToken(user.id, user.phoneNumber);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {

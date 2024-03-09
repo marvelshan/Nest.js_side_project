@@ -30,7 +30,11 @@ export class PatientService {
     return patients;
   }
 
-  async getPatients() {
-    return this.prisma.patient.findMany();
+  async getPatients(userId: number) {
+    return this.prisma.patient.findMany({
+      where: {
+        userId: userId,
+      },
+    });
   }
 }

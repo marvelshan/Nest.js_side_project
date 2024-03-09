@@ -48,6 +48,11 @@ $ npm run prisma:dev:deploy
 $ npm run db:dev:restart
 ```
 
+## API Documentation
+
+The API documentation is generated using Swagger.
+Access the API documentation at [/api](http://localhost:3000/api) .
+
 ## API endpoint
 
 ### Completed Endpoints

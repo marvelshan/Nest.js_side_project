@@ -3,6 +3,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
@@ -56,10 +57,7 @@ export class AuthService {
       return this.signToken(user.id, user.phoneNumber);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        // 'Unique constraint failed on the {constraint}'
-        if (error.code === 'P2002') {
-          throw new ForbiddenException('Credentials taken');
-        }
+        return this.handlePrismaError(error);
       }
       throw error;
     }
@@ -85,7 +83,10 @@ export class AuthService {
 
       return this.signToken(user.id, user.phoneNumber);
     } catch (error) {
-      console.log(`auth service signin error is ${error}`);
+      if (error instanceof PrismaClientKnownRequestError) {
+        return this.handlePrismaError(error);
+      }
+      throw error;
     }
   }
 
@@ -93,16 +94,37 @@ export class AuthService {
     userId: number,
     phoneNumber: string,
   ): Promise<{ access_token: string }> {
-    const payload = {
-      sub: userId,
-      phoneNumber,
-    };
-    const secret = this.config.get('JWT_SECRET');
-    const token = await this.jwt.signAsync(payload, {
-      expiresIn: '15m',
-      secret,
-    });
+    try {
+      const payload = {
+        sub: userId,
+        phoneNumber,
+      };
+      const secret = this.config.get('JWT_SECRET');
+      const token = await this.jwt.signAsync(payload, {
+        expiresIn: '15m',
+        secret,
+      });
 
-    return { access_token: token };
+      return { access_token: token };
+    } catch (error) {
+      throw new ForbiddenException('Unable to sign token');
+    }
+  }
+
+  private handlePrismaError(error: PrismaClientKnownRequestError) {
+    switch (error.code) {
+      case 'P2000':
+        throw new BadRequestException(
+          'The provided value for the column is too long for the column’s type.',
+        );
+      case 'P2002':
+        throw new ConflictException('Credentials taken');
+      case 'P2025':
+        throw new NotFoundException(
+          'An operation failed because it depends on one or more records that were required but not found',
+        );
+      default:
+        throw error;
+    }
   }
 }

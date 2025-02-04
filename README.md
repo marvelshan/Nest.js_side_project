@@ -1,4 +1,4 @@
-# EUCare Backend Assessment
+# Nestjs Backend Project
 
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
@@ -9,7 +9,7 @@
 
 ## Description
 
-This repository contains the backend assessment for EUCare, developed using NestJS as the backend framework and TypeScript for writing code. The assessment involves implementing various endpoints and setting up the database structure using Prisma Migrate with PostgreSQL.
+This repository contains a NestJS backend side project, developed using NestJS as the backend framework and TypeScript for writing code. The project involves implementing various endpoints and setting up the database structure using Prisma Migrate with PostgreSQL.
 
 ## Installation
 
